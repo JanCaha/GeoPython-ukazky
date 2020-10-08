@@ -30,10 +30,10 @@ for feature in input_layer:
     # print(point_geom.ExportToWkt())
 
     featureDefn: ogr.FeatureDefn = output_layer.GetLayerDefn()
-    feature: ogr.Feature = ogr.Feature(featureDefn)
-    feature.SetGeometry(point_geom)
-    feature.SetField("id", i)
-    output_layer.CreateFeature(feature)
+    new_feature: ogr.Feature = ogr.Feature(featureDefn)
+    new_feature.SetGeometry(point_geom)
+    new_feature.SetField("id", i)
+    output_layer.CreateFeature(new_feature)
 
     print(i)
     i += 1
