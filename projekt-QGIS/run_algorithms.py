@@ -1,10 +1,12 @@
 from pathlib import Path
 
+# qgis knihovny dvě části, jednak QGIS a modul processing
 import processing
+from processing.core.Processing import Processing
 from qgis.analysis import QgsNativeAlgorithms
 from qgis.core import QgsApplication
-from processing.core.Processing import Processing
 
+# incializace QGIS
 app = QgsApplication([], False)
 Processing.initialize()
 app.processingRegistry().addProvider(QgsNativeAlgorithms())
@@ -25,9 +27,9 @@ parameters = {'INPUT': str(path_input_data),
 processing.run("native:randompointsinpolygons",
                parameters=parameters)
 
-processing.run("gdal:rasterize",
+result = processing.run("gdal:rasterize",
                {'INPUT': str(path_input_data),
-                'FIELD':'CNTY_ID',
+                'FIELD': 'CNTY_ID',
                 'BURN': 0,
                 'UNITS': 1,
                 'WIDTH': 1,
@@ -39,4 +41,8 @@ processing.run("gdal:rasterize",
                 'INIT': None,
                 'INVERT': False,
                 'EXTRA': '',
-                'OUTPUT': str(path_output_raster)})
+                'OUTPUT': 'TEMPORARY_OUTPUT'})
+
+print(result)
+path_result = result["OUTPUT"]
+print(path_result)

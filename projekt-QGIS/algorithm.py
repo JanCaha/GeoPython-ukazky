@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from PyQt5.QtCore import QVariant
+
 from qgis.core import QgsApplication
 from qgis.core import (
     QgsVectorLayer,
@@ -7,6 +9,7 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsFields,
+    QgsField,
     QgsVectorFileWriter,
     QgsWkbTypes)
 
@@ -14,21 +17,22 @@ app = QgsApplication([], False)
 
 path_input_layer = Path(__file__).parent.parent / "Projekt1" / "data" / "nc.gpkg"
 
-path_output_layer = path_output_points = Path(__file__).parent / "outputs" / "centroids_nc.gpkg"
+path_output_layer = Path(__file__).parent / "outputs" / "convex_hull_nc.gpkg"
 
 layer_input: QgsVectorLayer = QgsVectorLayer(str(path_input_layer))
 
 features: QgsFeatureIterator = layer_input.getFeatures()
 
-feature: QgsFeature
-
 fields: QgsFields = QgsFields()
+fields.append(QgsField("name", QVariant.String))
 
-writer:  QgsVectorFileWriter = QgsVectorFileWriter(str(path_output_layer),
-                                                   "UTF-8",
-                                                   fields,
-                                                   QgsWkbTypes.Point,
-                                                   layer_input.sourceCrs())
+writer: QgsVectorFileWriter = QgsVectorFileWriter(str(path_output_layer),
+                                                  "UTF-8",
+                                                  fields,
+                                                  QgsWkbTypes.Polygon,
+                                                  layer_input.sourceCrs())
+
+feature: QgsFeature
 
 for feature in features:
 
@@ -36,10 +40,12 @@ for feature in features:
     print(attrs)
 
     geom: QgsGeometry = feature.geometry()
-
     print(geom.asWkt())
 
     f = QgsFeature(fields)
-    f.setGeometry(geom.centroid())
+    f.setAttribute("name", feature.attribute("NAME"))
+    f.setGeometry(geom.convexHull())
 
     writer.addFeature(f)
+
+del writer
