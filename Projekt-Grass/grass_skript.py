@@ -71,7 +71,8 @@ for path_file in path_data.iterdir():
 
     gscript.run_command("g.remove",
                         type="raster",
-                        name=int_rast_name + "@PERMANENT")
+                        name=int_rast_name + "@PERMANENT",
+                        flag="f")
 
     double_rast_name = imported + "_i_double"
 
